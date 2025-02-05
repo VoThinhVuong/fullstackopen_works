@@ -1,30 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Persons from './Component/Persons'
 import PersonForm from './Component/PersonForm'
 import Filter from './Component/Filter'
+import PersonServices from './Component/PersonServices'
+import Notification from './Component/Notification'
+import './index.css'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
-  const [filtered, setFilterPersons] = useState(persons)
+  const [persons, setPersons] = useState([])
+  const [filtered, setFilterPersons] = useState([])
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [type, setType] = useState("error")
 
+  useEffect(() => {
+    PersonServices
+    .getAll()
+    .then(AllPersons => {
+      setPersons(AllPersons)
+      setFilterPersons(AllPersons)
+    })
+  },[])
 
 
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={errorMessage} type={type}/>
       
       <Filter persons={persons} SetFilterPersons={setFilterPersons}/>
 
-      <PersonForm persons={persons} setPersons={setPersons}/>
+      <h2>add a new</h2>
+
+      <PersonForm persons={persons} filtered={filtered} setPersons={setPersons} setFilterPersons={setFilterPersons} setErrorMessage={setErrorMessage} setType={setType}/>
 
       <h2>Numbers</h2>
-      
-      <Persons persons={filtered}/>
+
+      <Persons filtered={filtered} persons={persons} setPersons={setPersons} setFilterPersons={setFilterPersons} setErrorMessage={setErrorMessage} setType={setType}/>
     </div>
   )
 }

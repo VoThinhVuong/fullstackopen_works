@@ -1,7 +1,8 @@
 import React from 'react'
+import PersonServices from './PersonServices'
 import { useState } from 'react'
 
-function PersonForm({persons, setPersons}) {
+function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMessage, setType}) {
     const [newName, setNewName] = useState('')
     const [newNum, setNewNumber] = useState('')
 
@@ -18,7 +19,7 @@ function PersonForm({persons, setPersons}) {
         const newPerson = {
           name: newName,
           number: newNum,
-          id: persons.length + 1
+          id: String(persons.length + 1)
         }
         console.log(newPerson)
     
@@ -28,11 +29,50 @@ function PersonForm({persons, setPersons}) {
         const dupNumber = persons.find(person => person.number == newPerson.number)
         console.log("duplicate number: ", dupNumber)
     
-        if(dupName != undefined) alert(`${newName} is already added to phonebook`)
-        if(dupNumber != undefined) alert(`${newNum} is already added to phonebook`)
+        if(dupName != undefined && dupNumber == undefined) {
+            if (window.confirm(`${newName} is already added to phonebook, repalce the old number with a new one?`)){
+                newPerson.id = dupName.id
+                PersonServices
+                .changeNumber(newPerson)
+                .then(updatedPerson => {
+                    setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson : person))
+                    setPersons(filtered.map(person => person.id == updatedPerson.id ? updatedPerson : person))
+                    setNewName('')
+                    setNewNumber('')
+                    setType('succ')
+                    setErrorMessage(
+                        `Updated ${updatedPerson.name}'s number`
+                    )
+                    setTimeout(() => {
+                        setErrorMessage(null)
+                    }, 5000)
+                })
+                .catch(error => {
+                    alert(`Unable to update ${newName}`)
+                })
+            }
+        }
+        else if (dupName != undefined && dupNumber != undefined) alert(`${newName} is already added to phonebook`)
+        else if(dupName == undefined && dupNumber != undefined) alert(`${newNum} is already added to phonebook`)
         else {
-          setPersons(persons.concat(newPerson))
-          setNewName('')
+            PersonServices
+            .createPerson(newPerson)
+            .then(person => {
+                setPersons(persons.concat(newPerson))
+                setFilterPersons(persons.concat(newPerson))
+                setNewName('')
+                setNewNumber('')
+                setType('succ')
+                setErrorMessage(
+                    `Added ${person.name}`
+                )
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 5000)
+            })
+            .catch(error => {
+                alert(`Unable to add ${newName}`)
+            })
         }
     }
 
