@@ -58,8 +58,8 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
             PersonServices
             .createPerson(newPerson)
             .then(person => {
-                setPersons(persons.concat(newPerson))
-                setFilterPersons(persons.concat(newPerson))
+                setPersons(persons.concat(person))
+                setFilterPersons(persons.concat(person))
                 setNewName('')
                 setNewNumber('')
                 setType('succ')
