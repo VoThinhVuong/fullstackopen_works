@@ -22,7 +22,7 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
         }
         console.log(newPerson)
     
-        const dupName = persons.find(person => person.name == newPerson.name )
+        const dupName = persons.find(person =>  person.name.toLowerCase() == newPerson.name.toLowerCase() )
         console.log("duplicate name: ", dupName)
     
         const dupNumber = persons.find(person => person.number == newPerson.number)
