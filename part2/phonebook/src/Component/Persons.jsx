@@ -7,7 +7,6 @@ function Persons({filtered,persons, setPersons, setFilterPersons, setErrorMessag
         if(window.confirm(`Delete ${person.name}?`)){ 
             PersonServices.deletePerson(person.id)
             .then(person => {
-                console.log(`deleted ${person}`)
                 setPersons(persons.filter(n => n.id !== person.id))
                 setFilterPersons(filtered.filter(n => n.id !== person.id))
                 setType('succ')
