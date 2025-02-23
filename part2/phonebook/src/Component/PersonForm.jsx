@@ -19,7 +19,6 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
         const newPerson = {
           name: newName,
           number: newNum,
-          id: String(persons.length + 1)
         }
         console.log(newPerson)
     
@@ -35,8 +34,10 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
                 PersonServices
                 .changeNumber(newPerson)
                 .then(updatedPerson => {
+                    console.log(updatedPerson)
+                    console.log(persons)
                     setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson : person))
-                    setPersons(filtered.map(person => person.id == updatedPerson.id ? updatedPerson : person))
+                    setFilterPersons(filtered.map(person => person.id == updatedPerson.id ? updatedPerson : person))
                     setNewName('')
                     setNewNumber('')
                     setType('succ')
@@ -48,12 +49,34 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
                     }, 5000)
                 })
                 .catch(error => {
-                    alert(`Unable to update ${newName}`)
+                    setType('error')
+                    setErrorMessage(
+                        `${error.response.data.error}`
+                    )
+                    setTimeout(() => {
+                        setErrorMessage(null)
+                    }, 5000)
                 })
             }
         }
-        else if (dupName != undefined && dupNumber != undefined) alert(`${newName} is already added to phonebook`)
-        else if(dupName == undefined && dupNumber != undefined) alert(`${newNum} is already added to phonebook`)
+        else if (dupName != undefined && dupNumber != undefined) {
+            setType('error')
+            setErrorMessage(
+                `${newName} or ${newNum} are already added to phonebook`
+            )
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
+        }
+        else if(dupName == undefined && dupNumber != undefined) {
+            setType('error')
+            setErrorMessage(
+                `${newNum} is already added to phonebook`
+            )
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
+        }
         else {
             PersonServices
             .createPerson(newPerson)
@@ -71,7 +94,13 @@ function PersonForm({persons,filtered, setPersons, setFilterPersons, setErrorMes
                 }, 5000)
             })
             .catch(error => {
-                alert(`Unable to add ${newName}`)
+                setType('error')
+                setErrorMessage(
+                    `${error.response.data.error}`
+                )
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 5000)
             })
         }
     }
