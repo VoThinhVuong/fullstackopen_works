@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
-import reducer from '../reducers/anecdoteReducer'
 import { addVote } from '../reducers/anecdoteReducer'
+import { setNoti, hideNoti } from '../reducers/notiReducer'
 
 const Anecdote = ({anecdote, voteHandler}) => {
     return(
@@ -10,7 +10,7 @@ const Anecdote = ({anecdote, voteHandler}) => {
             </div>
             <div>
                 has {anecdote.votes}
-                <button onClick={() => voteHandler(anecdote.id)}>vote</button>
+                <button onClick={() => voteHandler(anecdote.id, anecdote.content)}>vote</button>
             </div>
         </div>
     )
@@ -19,11 +19,21 @@ const Anecdote = ({anecdote, voteHandler}) => {
 
 const AnecdoteList = () => {
 
-    const anecdotes = useSelector(state => state).sort((a, b) => b.votes - a.votes)
-    const dispatch = useDispatch(reducer)
+    const anecdotes = useSelector(state => { 
+        if (state.filter === '')
+            return [...state.anecdotes].sort((a, b) => b.votes - a.votes)
+        else
+            return [...state.anecdotes]
+        .filter(anec => anec.content.toLowerCase().includes(state.filter.toLowerCase()))
+        .sort((a, b) => b.votes - a.votes)
+    })
 
-    const vote = (id) => {
+    const dispatch = useDispatch()
+
+    const vote = (id, content) => {
         dispatch(addVote(id))
+        dispatch(setNoti(`you voted '${content}'`))
+        setTimeout(() => dispatch(hideNoti()), 5000)
     }
 
     return(
